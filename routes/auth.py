@@ -1,15 +1,12 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import jwt_required, create_access_token
 
 # Cria um blueprint para as rotas de autenticação
 auth_routes = Blueprint('auth_routes', __name__)
 
-# Configuração do JWT
-jwt = JWTManager()
-
 # Rota para autenticação
 @auth_routes.route('/auth', methods=['POST'])
-def auth():
+def authenticate():
     email = request.json.get('email', None)
     password = request.json.get('password', None)
 
