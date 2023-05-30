@@ -1,53 +1,20 @@
 from flask import Blueprint, jsonify, request
 import sqlite3
 from utils.enc_dec_password import decrypt_password
+from utils.pagination import Pagination
 
 # Cria um blueprint para a rota de autenticação de usuários
 users_get_routes = Blueprint('users_get_routes', __name__)
-
-# Rota para autenticação de usuários
-@users_get_routes.route('/users/authenticate', methods=['POST'])
-def authenticate_user():
-    conn = sqlite3.connect('estoque.db')
-    cursor = conn.cursor()
-
-    # Obtém os dados do usuário do corpo da solicitação
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
-
-    # Verifica se o email e a senha foram fornecidos
-    if not email or not password:
-        conn.close()
-        return jsonify({'error': 'O email e a senha são obrigatórios'}), 400
-
-    # Verifica se o usuário existe no banco de dados
-    cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-    existing_user = cursor.fetchone()
-
-    if not existing_user:
-        conn.close()
-        return jsonify({'error': 'Credenciais inválidas'}), 401
-
-    # Descriptografa a senha e verifica se corresponde à senha fornecida
-    if not decrypt_password(existing_user[2], password):
-        conn.close()
-        return jsonify({'error': 'Credenciais inválidas'}), 401
-
-    conn.close()
-
-    # Retorna a resposta com o ID do usuário autenticado
-    response = {
-        'id': existing_user[0],
-        'email': existing_user[1]
-    }
-    return jsonify(response), 200
 
 # Rota para listar todos os usuários
 @users_get_routes.route('/users', methods=['GET'])
 def get_all_users():
     conn = sqlite3.connect('estoque.db')
     cursor = conn.cursor()
+
+    # Obtém a página atual da query string
+    page = int(request.args.get('page', 1))
+    per_page = 15
 
     # Obtém todos os usuários do banco de dados
     cursor.execute('SELECT * FROM users')
@@ -65,6 +32,9 @@ def get_all_users():
         }
         users_list.append(user_dict)
 
-    # Retorna a lista de usuários
-    return jsonify(users_list)
+    # Aplica a paginação aos usuários
+    paginator = Pagination(users_list, page, per_page)
+    paginated_users = paginator.paginate()
 
+    # Retorna os usuários paginados
+    return jsonify(paginated_users)
