@@ -1,6 +1,15 @@
 from flask import Flask
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
+
+# Configuração do JWT
+app.config['JWT_SECRET_KEY'] = 'super-secret-key'
+app.config['JWT_SETTINGS'] = {
+    'JWT_TOKEN_LOCATION': ['headers', 'json']
+}
+jwt = JWTManager(app)
+
 
 from routes.auth import auth_routes
 from routes.auth_refresh import auth_refresh_routes
@@ -19,12 +28,6 @@ app.register_blueprint(products_post_routes)
 app.register_blueprint(products_get_routes)
 app.register_blueprint(users_post_routes)
 app.register_blueprint(users_get_routes)
-
-# Configuração do JWT
-from flask_jwt_extended import JWTManager
-
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'  # Defina uma chave secreta para assinar os tokens JWT
-jwt = JWTManager(app)
 
 if __name__ == '__main__':
     app.run(debug=True)
