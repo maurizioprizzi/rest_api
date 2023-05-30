@@ -1,5 +1,6 @@
 from flask import Flask
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from flask import Blueprint, jsonify, request
 
 app = Flask(__name__)
 

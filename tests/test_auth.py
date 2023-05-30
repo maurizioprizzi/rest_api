@@ -1,5 +1,6 @@
-import pytest
+import unittest
 from flask import Flask
+from routes.auth import auth_routes
 from flask_jwt_extended import JWTManager
 
 # Cria uma instância do Flask para os testes
@@ -10,10 +11,10 @@ jwt = JWTManager(app)
 class AuthTestCase(unittest.TestCase):
 
     def setUp(self):
-        # Cria uma instância do aplicativo Flask
         self.app = Flask(__name__)
+        self.app.config['JWT_SECRET_KEY'] = 'super-secret-key'
+        self.jwt = JWTManager(self.app)
         self.app.register_blueprint(auth_routes)
-        self.app.testing = True
         self.client = self.app.test_client()
 
     def test_authentication(self):
