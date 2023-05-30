@@ -28,7 +28,7 @@ def get_all_users():
         user_dict = {
             'id': user[0],
             'email': user[1],
-            'password': user[2].decode('utf-8')  # Converte bytes em string
+            'password': user[2]  # Assuming password is already a string
         }
         users_list.append(user_dict)
 
