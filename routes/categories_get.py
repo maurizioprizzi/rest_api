@@ -2,6 +2,7 @@
 
 from flask import Blueprint, jsonify
 import sqlite3
+from contextlib import closing
 
 # Cria um blueprint para a rota de listagem de categorias
 categories_get_routes = Blueprint('categories_get_routes', __name__)
@@ -9,7 +10,7 @@ categories_get_routes = Blueprint('categories_get_routes', __name__)
 # Rota para listagem de categorias
 @categories_get_routes.route('/categories', methods=['GET'])
 def get_categories():
-    with sqlite3.connect('estoque.db') as conn:
+    with closing(sqlite3.connect('estoque.db')) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 

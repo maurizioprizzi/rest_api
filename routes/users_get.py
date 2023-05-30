@@ -1,40 +1,30 @@
-from flask import Blueprint, jsonify, request
-import sqlite3
-from utils.enc_dec_password import decrypt_password
-from utils.pagination import Pagination
+# users_get.py
 
-# Cria um blueprint para a rota de autenticação de usuários
+from flask import Blueprint, jsonify
+import sqlite3
+from contextlib import closing
+
+# Cria um blueprint para a rota de listagem de usuários
 users_get_routes = Blueprint('users_get_routes', __name__)
 
-# Rota para listar todos os usuários
+# Rota para listagem de usuários
 @users_get_routes.route('/users', methods=['GET'])
 def get_all_users():
-    conn = sqlite3.connect('estoque.db')
-    cursor = conn.cursor()
+    with closing(sqlite3.connect('estoque.db')) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
 
-    # Obtém a página atual da query string
-    page = int(request.args.get('page', 1))
-    per_page = 15
+        # Executa uma consulta para obter todos os usuários do banco de dados
+        cursor.execute('SELECT * FROM users')
+        rows = cursor.fetchall()
 
-    # Obtém todos os usuários do banco de dados
-    cursor.execute('SELECT * FROM users')
-    users = cursor.fetchall()
+        users = []
+        for row in rows:
+            user = {
+                'id': row['id'],
+                'name': row['name'],
+                'email': row['email']
+            }
+            users.append(user)
 
-    conn.close()
-
-    # Converte cada tupla em um dicionário
-    users_list = []
-    for user in users:
-        user_dict = {
-            'id': user[0],
-            'email': user[1],
-            'password': user[2]  # Assuming password is already a string
-        }
-        users_list.append(user_dict)
-
-    # Aplica a paginação aos usuários
-    paginator = Pagination(users_list, page, per_page)
-    paginated_users = paginator.paginate()
-
-    # Retorna os usuários paginados
-    return jsonify(paginated_users)
+    return jsonify(users), 200
