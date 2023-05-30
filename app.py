@@ -12,6 +12,10 @@ from routes.categories_get import categories_get_routes
 from routes.categories_post import categories_post_routes
 # Importa a rota de inserção de produtos do arquivo routes/products_post.py
 from routes.products_post import products_post_routes
+# Importa a rota de registro de usuários do arquivo routes/users_post.py
+from routes.users_post import users_post_routes
+# Importa a rota de autenticação de usuários do arquivo routes/users_get.py
+from routes.users_get import users_get_routes
 
 # Registra as rotas de autenticação no aplicativo Flask
 app.register_blueprint(auth_routes)
@@ -23,6 +27,10 @@ app.register_blueprint(categories_get_routes)
 app.register_blueprint(categories_post_routes)
 # Registra a rota de inserção de produtos no aplicativo Flask
 app.register_blueprint(products_post_routes)
+# Registra a rota de registro de usuários no aplicativo Flask
+app.register_blueprint(users_post_routes)
+# Registra a rota de autenticação de usuários no aplicativo Flask
+app.register_blueprint(users_get_routes)
 
 # Configuração do JWT
 from flask_jwt_extended import JWTManager
