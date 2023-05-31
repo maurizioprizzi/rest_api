@@ -17,8 +17,8 @@ class ProductsGetTestCase(unittest.TestCase):
         # Create a mock cursor that fetches some dummy products
         mock_cursor = Mock()
         mock_cursor.fetchall.return_value = [
-            (1, 'product1', 10, 1, 'category1'), 
-            (2, 'product2', 20, 2, 'category2')
+            (1, 'Product 1', 10, 1, 'Categoria 1'), 
+            (2, 'Product 2', 20, 2, 'Categoria 2')
         ]
 
         # Make connect() return a mock connection that returns our mock cursor
@@ -31,15 +31,15 @@ class ProductsGetTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, [
-            {'id': 1, 'name': 'product1', 'quantity': 10, 'category_id': 1, 'category_name': 'category1'}, 
-            {'id': 2, 'name': 'product2', 'quantity': 20, 'category_id': 2, 'category_name': 'category2'}
+            {'id': 1, 'name': 'Product 1', 'quantity': 120, 'category_id': 1, 'category_name': 'Categoria 1'}, 
+            {'id': 1, 'name': 'Product 2', 'quantity': 60, 'category_id': 2, 'category_name': 'Categoria 2'}
         ])
 
     @patch('sqlite3.connect')
     def test_get_product(self, mock_connect):
         # Create a mock cursor that fetches a dummy product
         mock_cursor = Mock()
-        mock_cursor.fetchone.return_value = (1, 'product1', 10, 1, 'category1')
+        mock_cursor.fetchone.return_value = (1, 'Product 1', 10, 1, 'Categoria 1')
 
         # Make connect() return a mock connection that returns our mock cursor
         mock_conn = Mock()
@@ -50,7 +50,7 @@ class ProductsGetTestCase(unittest.TestCase):
         data = response.get_json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, {'id': 1, 'name': 'product1', 'quantity': 10, 'category_id': 1, 'category_name': 'category1'})
+        self.assertEqual(data, {'id': 1, 'name': 'Product 1', 'quantity': 120, 'category_id': 1, 'category_name': 'Categoria 1'})
 
     @patch('sqlite3.connect')
     def test_get_product_not_found(self, mock_connect):

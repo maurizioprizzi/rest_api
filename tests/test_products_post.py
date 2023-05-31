@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 from flask import Flask
 from routes.products_post import products_post_routes
+import sqlite3
 
 class ProductsPostTestCase(unittest.TestCase):
 
