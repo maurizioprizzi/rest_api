@@ -3,11 +3,6 @@ from flask import Flask
 from routes.auth import auth_routes
 from flask_jwt_extended import JWTManager
 
-# Cria uma instância do Flask para os testes
-app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'
-jwt = JWTManager(app)
-
 class AuthTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -28,11 +23,9 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_protected_route_with_authentication(self):
-        # Simula a autenticação obtendo o token de acesso
         auth_response = self.client.post('/auth', json={'email': 'admin@user.com', 'password': '123456'})
         access_token = auth_response.get_json()['access_token']
 
-        # Faz a chamada à rota protegida incluindo o token de acesso no cabeçalho
         headers = {'Authorization': f'Bearer {access_token}'}
         response = self.client.get('/protected', headers=headers)
 

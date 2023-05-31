@@ -1,29 +1,44 @@
-# categories_get.py
-
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, current_app
 import sqlite3
-from contextlib import closing
+from sqlite3 import Error
+import logging
 
-# Cria um blueprint para a rota de listagem de categorias
 categories_get_routes = Blueprint('categories_get_routes', __name__)
 
-# Rota para listagem de categorias
-@categories_get_routes.route('/categories', methods=['GET'])
-def get_categories():
-    with closing(sqlite3.connect('estoque.db')) as conn:
+def get_db_connection():
+    try:
+        conn = sqlite3.connect('estoque.db')
         conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
+        return conn, None
+    except Error as e:
+        logging.error(str(e))
+        return None, "Cannot establish a DB connection"
 
-        # Executa uma consulta para obter as categorias do banco de dados
+def get_categories_db():
+    conn, error = get_db_connection()
+    if conn is None:
+        return None, error, 500
+    
+    cursor = conn.cursor()
+    try:
         cursor.execute('SELECT * FROM categories')
         rows = cursor.fetchall()
 
         categories = []
         for row in rows:
-            category = {
-                'id': row['id'],
-                'name': row['name']
-            }
-            categories.append(category)
+            categories.append({'id': row['id'], 'name': row['name']})
 
-    return jsonify(categories), 200
+        return categories, None, 200
+    except Error as e:
+        logging.error(str(e))
+        return None, str(e), 500
+    finally:
+        conn.close()
+
+@categories_get_routes.route('/categories', methods=['GET'])
+def get_categories():
+    categories, error, status_code = get_categories_db()
+    if categories is None:
+        return jsonify({'error': error}), status_code
+    else:
+        return jsonify(categories), status_code
