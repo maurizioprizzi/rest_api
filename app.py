@@ -1,11 +1,16 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask import Blueprint, jsonify, request
+import os
+from dotenv import load_dotenv
+
+# Carregar as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 app = Flask(__name__)
 
 # Configuração do JWT
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_SETTINGS'] = {
     'JWT_TOKEN_LOCATION': ['headers', 'json']
 }
